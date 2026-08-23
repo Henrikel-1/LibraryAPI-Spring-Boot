@@ -10,9 +10,14 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class LivroService {
+
     private final LivroRepository livroRepository;
 
     public List<Livro> listarTodos(){
         return livroRepository.findAll();
+    }
+
+    public void salvar(Livro livro){
+        livroRepository.save(livro);
     }
 }
