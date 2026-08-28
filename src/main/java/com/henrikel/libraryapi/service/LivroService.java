@@ -17,7 +17,14 @@ public class LivroService {
         return livroRepository.findAll();
     }
 
-    public void salvar(Livro livro){
-        livroRepository.save(livro);
+    public Livro salvar(Livro livro){
+        return livroRepository.save(livro);
     }
+
+    public Livro deletar(Long id){
+        Livro livro = livroRepository.findById(id).orElseThrow(() -> new RuntimeException("Livro não encontrado"));
+        livroRepository.delete(livro);
+        return livro;
+    }
+
 }

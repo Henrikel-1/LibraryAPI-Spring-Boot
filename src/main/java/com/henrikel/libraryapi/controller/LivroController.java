@@ -21,10 +21,14 @@ public class LivroController {
         return livroService.listarTodos();
     }
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String salvarLivro(@RequestBody @Valid Livro livro){
+    public Livro salvarLivro(@RequestBody @Valid Livro livro){
         livroService.salvar(livro);
-        return "Livro: " + livro.getTitulo() + ". ID:" + livro.getId() + ". salvo com sucesso";
+        return livro;
+    }
+    @DeleteMapping("/{id}")
+    public Livro excluirLivro(@PathVariable long id){
+        return livroService.deletar(id);
     }
 }
