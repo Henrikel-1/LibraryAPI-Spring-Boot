@@ -26,5 +26,8 @@ public class LivroService {
         livroRepository.delete(livro);
         return livro;
     }
+    public Livro buscarLivro(Long id){
+        return livroRepository.findById(id).orElseThrow(() -> new RuntimeException("Livro não encontrado"));
+    }
 
 }

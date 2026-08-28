@@ -31,4 +31,8 @@ public class LivroController {
     public Livro excluirLivro(@PathVariable long id){
         return livroService.deletar(id);
     }
+    @GetMapping("/{id}")
+    public Livro buscarLivro(@PathVariable Long id){
+        return livroService.buscarLivro(id);
+    }
 }
