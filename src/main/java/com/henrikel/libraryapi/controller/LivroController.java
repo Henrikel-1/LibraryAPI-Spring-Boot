@@ -28,11 +28,15 @@ public class LivroController {
         return livro;
     }
     @DeleteMapping("/{id}")
-    public Livro excluirLivro(@PathVariable long id){
+    public Livro excluirLivro(@PathVariable Long id){
         return livroService.deletar(id);
     }
     @GetMapping("/{id}")
     public Livro buscarLivro(@PathVariable Long id){
         return livroService.buscarLivro(id);
+    }
+    @PutMapping("/{id}")
+    public Livro alterarLivro(@PathVariable Long id, @RequestBody @Valid Livro livro){
+        return livroService.alterarLivro(id, livro);
     }
 }
