@@ -1,9 +1,14 @@
 package com.henrikel.libraryapi.controller;
 
+import com.henrikel.libraryapi.dto.LivroRequestDTO;
 import com.henrikel.libraryapi.model.Livro;
 import com.henrikel.libraryapi.service.LivroService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,15 +22,14 @@ public class LivroController {
     private final LivroService livroService;
 
     @GetMapping
-    public List<Livro> listarLivros(){
-        return livroService.listarTodos();
+    public Page<Livro> listarLivros(@PageableDefault(size = 10, sort = "titulo")Pageable pageable){
+        return livroService.listarTodos(pageable);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Livro salvarLivro(@RequestBody @Valid Livro livro){
-        livroService.salvar(livro);
-        return livro;
+    public Livro salvarLivro(@RequestBody @Valid LivroRequestDTO dto){
+        return livroService.salvar(dto);
     }
     @DeleteMapping("/{id}")
     public Livro excluirLivro(@PathVariable Long id){
@@ -36,7 +40,7 @@ public class LivroController {
         return livroService.buscarLivro(id);
     }
     @PutMapping("/{id}")
-    public Livro alterarLivro(@PathVariable Long id, @RequestBody @Valid Livro livro){
-        return livroService.alterarLivro(id, livro);
+    public Livro alterarLivro(@PathVariable Long id, @RequestBody @Valid LivroRequestDTO dto){
+        return livroService.alterarLivro(id, dto);
     }
 }
