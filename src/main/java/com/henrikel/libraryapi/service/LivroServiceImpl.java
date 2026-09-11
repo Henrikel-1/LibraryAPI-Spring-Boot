@@ -1,6 +1,7 @@
 package com.henrikel.libraryapi.service;
 
 import com.henrikel.libraryapi.dto.LivroRequestDTO;
+import com.henrikel.libraryapi.dto.LivroResponseDTO;
 import com.henrikel.libraryapi.model.Livro;
 import com.henrikel.libraryapi.repository.LivroRepository;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class LivroServiceImp implements LivroService{
+public class LivroServiceImpl implements LivroService{
 
     private final LivroRepository livroRepository;
 
@@ -36,6 +37,11 @@ public class LivroServiceImp implements LivroService{
     public Livro buscarLivro(Long id){
         return livroRepository.findById(id).orElseThrow(() -> new RuntimeException("Livro não encontrado"));
     }
+
+    public List<LivroResponseDTO> buscarLivroQuery(String titulo){
+        return livroRepository.findByTitulo(titulo).stream().map(livro -> new LivroResponseDTO(livro.getTitulo())).toList();
+    }
+
     public Livro alterarLivro(Long id, LivroRequestDTO dto){
         Livro livro2 = livroRepository.findById(id).orElseThrow(() -> new RuntimeException("Livro não encontrado"));
         livro2.setTitulo(dto.titulo());

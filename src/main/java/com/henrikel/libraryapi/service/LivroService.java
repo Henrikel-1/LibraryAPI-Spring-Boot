@@ -1,6 +1,7 @@
 package com.henrikel.libraryapi.service;
 
 import com.henrikel.libraryapi.dto.LivroRequestDTO;
+import com.henrikel.libraryapi.dto.LivroResponseDTO;
 import com.henrikel.libraryapi.model.Livro;
 
 import org.springframework.data.domain.Page;
@@ -13,5 +14,5 @@ public interface LivroService {
     Livro deletar(Long id);
     Livro buscarLivro(Long id);
     Livro alterarLivro(Long id, LivroRequestDTO dto);
-
+    List<LivroResponseDTO> buscarLivroQuery(String titulo);
 }

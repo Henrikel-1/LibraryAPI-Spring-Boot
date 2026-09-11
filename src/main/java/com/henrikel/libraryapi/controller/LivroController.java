@@ -1,6 +1,7 @@
 package com.henrikel.libraryapi.controller;
 
 import com.henrikel.libraryapi.dto.LivroRequestDTO;
+import com.henrikel.libraryapi.dto.LivroResponseDTO;
 import com.henrikel.libraryapi.model.Livro;
 import com.henrikel.libraryapi.service.LivroService;
 import jakarta.validation.Valid;
@@ -29,16 +30,28 @@ public class LivroController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Livro salvarLivro(@RequestBody @Valid LivroRequestDTO dto){
+
         return livroService.salvar(dto);
     }
+
     @DeleteMapping("/{id}")
     public Livro excluirLivro(@PathVariable Long id){
+
         return livroService.deletar(id);
     }
+
+    @GetMapping("titulo")
+    public List<LivroResponseDTO> buscarLivroQuery(@RequestParam("titulo") String titulo){
+
+        return livroService.buscarLivroQuery(titulo);
+    }
+
     @GetMapping("/{id}")
     public Livro buscarLivro(@PathVariable Long id){
+
         return livroService.buscarLivro(id);
     }
+
     @PutMapping("/{id}")
     public Livro alterarLivro(@PathVariable Long id, @RequestBody @Valid LivroRequestDTO dto){
         return livroService.alterarLivro(id, dto);
