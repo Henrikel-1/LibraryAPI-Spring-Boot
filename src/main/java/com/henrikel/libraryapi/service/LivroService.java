@@ -9,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface LivroService {
-    Page<Livro> listarTodos(Pageable pageable);
-    Livro salvar(LivroRequestDTO dto);
-    Livro deletar(Long id);
-    Livro buscarLivro(Long id);
-    Livro alterarLivro(Long id, LivroRequestDTO dto);
+    Page<LivroResponseDTO> listarTodos(Pageable pageable);
+    LivroResponseDTO salvar(LivroRequestDTO dto);
+    void deletar(Long id);
+    LivroResponseDTO buscarLivro(Long id);
+    LivroResponseDTO alterarLivro(Long id, LivroRequestDTO dto);
     List<LivroResponseDTO> buscarLivroQuery(String titulo);
 }

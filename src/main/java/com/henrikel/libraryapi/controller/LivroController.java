@@ -7,10 +7,12 @@ import com.henrikel.libraryapi.service.LivroService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,31 +31,28 @@ public class LivroController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Livro salvarLivro(@RequestBody @Valid LivroRequestDTO dto){
-
+    public LivroResponseDTO salvarLivro(@RequestBody @Valid LivroRequestDTO dto){
         return livroService.salvar(dto);
     }
 
     @DeleteMapping("/{id}")
-    public Livro excluirLivro(@PathVariable Long id){
-
-        return livroService.deletar(id);
+    public ResponseEntity<Void> excluirLivro(@PathVariable Long id){
+        livroService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("titulo")
     public List<LivroResponseDTO> buscarLivroQuery(@RequestParam("titulo") String titulo){
-
         return livroService.buscarLivroQuery(titulo);
     }
 
     @GetMapping("/{id}")
-    public Livro buscarLivro(@PathVariable Long id){
-
+    public LivroResponseDTO buscarLivro(@PathVariable Long id){
         return livroService.buscarLivro(id);
     }
 
     @PutMapping("/{id}")
-    public Livro alterarLivro(@PathVariable Long id, @RequestBody @Valid LivroRequestDTO dto){
+    public LivroResponseDTO alterarLivro(@PathVariable Long id, @RequestBody @Valid LivroRequestDTO dto){
         return livroService.alterarLivro(id, dto);
     }
 }
