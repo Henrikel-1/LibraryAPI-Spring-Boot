@@ -1,6 +1,7 @@
 package com.henrikel.libraryapi.service;
 
 import com.henrikel.libraryapi.core.exception.BusinessException;
+import com.henrikel.libraryapi.dto.LivroPatchDTO;
 import com.henrikel.libraryapi.dto.LivroRequestDTO;
 import com.henrikel.libraryapi.dto.LivroResponseDTO;
 import com.henrikel.libraryapi.model.Livro;
@@ -27,8 +28,14 @@ public class LivroServiceImpl implements LivroService{
     }
 
     public LivroResponseDTO salvar(LivroRequestDTO livro){
+        if (livroRepository.existsByTituloIgnoreCase(livro.titulo())){
+            throw new BusinessException(CONFLITO, "Já existe um livro cadastrado com esse título");
+        }
         Livro livro2 = new Livro();
         livro2.setTitulo(livro.titulo());
+        livro2.setAnoPubli(livro.anoPubli());
+        livro2.setEditora(livro.editora());
+        livro2.setEscritor(livro.escritor());
         livroRepository.save(livro2);
         return toResponse(livro2);
     }
@@ -43,17 +50,44 @@ public class LivroServiceImpl implements LivroService{
     }
 
     public List<LivroResponseDTO> buscarLivroQuery(String titulo){
-        return livroRepository.findByTitulo(titulo).stream().map(livro -> new LivroResponseDTO(livro.getTitulo())).toList();
+        return livroRepository.findByTitulo(titulo).stream().map(livro -> new LivroResponseDTO(livro.getTitulo(), livro.getAnoPubli(), livro.getEditora(), livro.getEscritor())).toList();
+    }
+
+    public LivroResponseDTO alterarAtributo(Long id, LivroPatchDTO dto) {
+        Livro livro = livroRepository.findById(id).orElseThrow(() -> new BusinessException(RECURSO_NAO_ENCONTRADO, "Livro não encontrado"));
+        if (dto.titulo() != null) {
+            if (livroRepository.existsByTituloIgnoreCaseAndIdNot(dto.titulo(), id)) {
+                throw new BusinessException(CONFLITO, "Já existe outro livro cadastrado com esse título");
+            }
+            livro.setTitulo(dto.titulo());
+        }
+        if (dto.anoPubli() != null) {
+            livro.setAnoPubli(dto.anoPubli());
+        }
+        if (dto.editora() != null) {
+            livro.setEditora(dto.editora());
+        }
+        if (dto.escritor() != null) {
+            livro.setEscritor(dto.escritor());
+        }
+        livroRepository.save(livro);
+        return toResponse(livro);
     }
 
     public LivroResponseDTO alterarLivro(Long id, LivroRequestDTO dto){
+        if (livroRepository.existsByTituloIgnoreCaseAndIdNot(dto.titulo(), id)){
+            throw new BusinessException(CONFLITO, "Já existe outro livro cadastrado com esse título");
+        }
         Livro livro2 = livroRepository.findById(id).orElseThrow(() -> new BusinessException(RECURSO_NAO_ENCONTRADO, "Livro não encontrado"));
         livro2.setTitulo(dto.titulo());
+        livro2.setAnoPubli(dto.anoPubli());
+        livro2.setEditora(dto.editora());
+        livro2.setEscritor(dto.escritor());
         livroRepository.save(livro2);
         return toResponse(livro2);
     }
     public LivroResponseDTO toResponse (Livro livro){
-        return new LivroResponseDTO(livro.getTitulo());
+        return new LivroResponseDTO(livro.getTitulo(), livro.getAnoPubli(), livro.getEditora(), livro.getEscritor());
     }
 
 }

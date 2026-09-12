@@ -1,5 +1,6 @@
 package com.henrikel.libraryapi.service;
 
+import com.henrikel.libraryapi.dto.LivroPatchDTO;
 import com.henrikel.libraryapi.dto.LivroRequestDTO;
 import com.henrikel.libraryapi.dto.LivroResponseDTO;
 import com.henrikel.libraryapi.model.Livro;
@@ -15,4 +16,5 @@ public interface LivroService {
     LivroResponseDTO buscarLivro(Long id);
     LivroResponseDTO alterarLivro(Long id, LivroRequestDTO dto);
     List<LivroResponseDTO> buscarLivroQuery(String titulo);
+    LivroResponseDTO alterarAtributo(Long id, LivroPatchDTO dto);
 }

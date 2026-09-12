@@ -1,4 +1,10 @@
 package com.henrikel.libraryapi.dto;
 
-public record LivroResponseDTO(String titulo) {
+import java.time.Year;
+
+public record LivroResponseDTO(
+                               String titulo,
+                               Year anoPubli,
+                               String editora,
+                               String escritor) {
 }
