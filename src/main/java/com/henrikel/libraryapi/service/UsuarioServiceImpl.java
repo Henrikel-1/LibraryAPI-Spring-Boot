@@ -2,14 +2,16 @@ package com.henrikel.libraryapi.service;
 
 import com.henrikel.libraryapi.core.exception.BusinessException;
 import com.henrikel.libraryapi.core.exception.TipoErro;
-import com.henrikel.libraryapi.dto.UsuarioPatchDto;
-import com.henrikel.libraryapi.dto.UsuarioRequestDTO;
-import com.henrikel.libraryapi.dto.UsuarioResponseDTO;
+import com.henrikel.libraryapi.dto.usuarioDTOS.UsuarioPatchDto;
+import com.henrikel.libraryapi.dto.usuarioDTOS.UsuarioRequestDTO;
+import com.henrikel.libraryapi.dto.usuarioDTOS.UsuarioResponseDTO;
+import com.henrikel.libraryapi.model.Papel;
 import com.henrikel.libraryapi.model.Usuario;
 import com.henrikel.libraryapi.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,17 +23,20 @@ import static com.henrikel.libraryapi.core.exception.TipoErro.CONFLITO;
 public class UsuarioServiceImpl implements UsuarioService{
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public Page<UsuarioResponseDTO> listarUsuarios(Pageable pageable) {
         return usuarioRepository.findAll(pageable).map(this::toResponse);
     }
 
     @Override
-    public UsuarioResponseDTO salvar(UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO salvarAdm(UsuarioRequestDTO usuarioRequestDTO) {
         if (usuarioRepository.existsByEmailIgnoreCase(usuarioRequestDTO.email())){
             throw new BusinessException(CONFLITO, "Já existe um usuário com este email");
         }
-        Usuario usuario = new Usuario(usuarioRequestDTO.nome(), usuarioRequestDTO.email(), usuarioRequestDTO.senha(), usuarioRequestDTO.papel() );
+        Usuario usuario = new Usuario(usuarioRequestDTO.nome(), usuarioRequestDTO.email(), usuarioRequestDTO.senha(), Papel.ADMIN );
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         return toResponse(usuarioRepository.save(usuario));
     }
 
@@ -55,8 +60,8 @@ public class UsuarioServiceImpl implements UsuarioService{
         }
         usuario.setNome(dto.nome());
         usuario.setEmail(dto.email());
-        usuario.setSenha(dto.senha());
-        usuario.setPapel(dto.papel());
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
+
         return toResponse(usuarioRepository.save(usuario));
     }
 
@@ -77,13 +82,23 @@ public class UsuarioServiceImpl implements UsuarioService{
             usuario.setEmail(usuarioPatchDto.email());
         }
         if (usuarioPatchDto.senha() != null){
-            usuario.setSenha(usuarioPatchDto.senha());
+            usuario.setSenha(passwordEncoder.encode(usuarioPatchDto.senha()));
         }
         if (usuarioPatchDto.papel() != null){
             usuario.setPapel(usuarioPatchDto.papel());
         }
         usuarioRepository.save(usuario);
         return toResponse(usuario);
+    }
+
+    @Override
+    public UsuarioResponseDTO salvarUsuario(UsuarioRequestDTO usuarioRequestDTO) {
+        if (usuarioRepository.existsByEmailIgnoreCase(usuarioRequestDTO.email())){
+            throw new BusinessException(CONFLITO, "Já existe um usuário com este email");
+        }
+        Usuario usuario = new Usuario(usuarioRequestDTO.nome(), usuarioRequestDTO.email(), usuarioRequestDTO.senha(), Papel.USER );
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        return toResponse(usuarioRepository.save(usuario));
     }
 
     public UsuarioResponseDTO toResponse(Usuario usuario){
