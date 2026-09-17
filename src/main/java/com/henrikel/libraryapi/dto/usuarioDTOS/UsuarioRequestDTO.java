@@ -1,4 +1,4 @@
-package com.henrikel.libraryapi.dto;
+package com.henrikel.libraryapi.dto.usuarioDTOS;
 
 import com.henrikel.libraryapi.model.Papel;
 import jakarta.validation.constraints.Email;
@@ -15,7 +15,5 @@ public record UsuarioRequestDTO(@NotBlank(message = "Nome é obrigatório")
                                 String email,
                                 @NotBlank(message = "Senha é obrigatório")
                                 @Size(min = 1, max = 200)
-                                String senha,
-                                @NotNull(message = "Papel é obrigatório")
-                                Papel papel) {
+                                String senha) {
 }

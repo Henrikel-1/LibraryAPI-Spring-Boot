@@ -1,9 +1,4 @@
-package com.henrikel.libraryapi.dto;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
+package com.henrikel.libraryapi.dto.livroDTOS;
 
 import java.time.Year;
 

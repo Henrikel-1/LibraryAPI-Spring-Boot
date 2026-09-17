@@ -1,4 +1,4 @@
-package com.henrikel.libraryapi.dto;
+package com.henrikel.libraryapi.dto.livroDTOS;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

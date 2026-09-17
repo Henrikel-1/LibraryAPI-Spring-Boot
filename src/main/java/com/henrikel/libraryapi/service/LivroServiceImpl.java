@@ -1,9 +1,9 @@
 package com.henrikel.libraryapi.service;
 
 import com.henrikel.libraryapi.core.exception.BusinessException;
-import com.henrikel.libraryapi.dto.LivroPatchDTO;
-import com.henrikel.libraryapi.dto.LivroRequestDTO;
-import com.henrikel.libraryapi.dto.LivroResponseDTO;
+import com.henrikel.libraryapi.dto.livroDTOS.LivroPatchDTO;
+import com.henrikel.libraryapi.dto.livroDTOS.LivroRequestDTO;
+import com.henrikel.libraryapi.dto.livroDTOS.LivroResponseDTO;
 import com.henrikel.libraryapi.model.Livro;
 import com.henrikel.libraryapi.repository.LivroRepository;
 import lombok.AllArgsConstructor;

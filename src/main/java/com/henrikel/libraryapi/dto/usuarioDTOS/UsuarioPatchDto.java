@@ -1,8 +1,7 @@
-package com.henrikel.libraryapi.dto;
+package com.henrikel.libraryapi.dto.usuarioDTOS;
 
 import com.henrikel.libraryapi.model.Papel;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record UsuarioPatchDto(

@@ -1,8 +1,8 @@
 package com.henrikel.libraryapi.controller;
 
-import com.henrikel.libraryapi.dto.LivroPatchDTO;
-import com.henrikel.libraryapi.dto.LivroRequestDTO;
-import com.henrikel.libraryapi.dto.LivroResponseDTO;
+import com.henrikel.libraryapi.dto.livroDTOS.LivroPatchDTO;
+import com.henrikel.libraryapi.dto.livroDTOS.LivroRequestDTO;
+import com.henrikel.libraryapi.dto.livroDTOS.LivroResponseDTO;
 
 import com.henrikel.libraryapi.service.LivroService;
 import jakarta.validation.Valid;

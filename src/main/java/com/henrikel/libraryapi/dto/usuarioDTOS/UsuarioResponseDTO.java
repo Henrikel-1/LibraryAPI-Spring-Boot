@@ -1,4 +1,4 @@
-package com.henrikel.libraryapi.dto;
+package com.henrikel.libraryapi.dto.usuarioDTOS;
 
 import com.henrikel.libraryapi.model.Papel;
 
