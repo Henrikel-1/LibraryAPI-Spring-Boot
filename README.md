@@ -1,69 +1,177 @@
 # 📚 Library API
 
-![Java](https://img.shields.io/badge/Java-17+-orange?style=for-the-badge&logo=java)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=for-the-badge&logo=spring)
+![Java](https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.0-brightgreen?style=for-the-badge&logo=spring)
+![Gradle](https://img.shields.io/badge/Gradle-Kotlin%20DSL-02303A?style=for-the-badge&logo=gradle)
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-green?style=for-the-badge&logo=springsecurity)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+![H2](https://img.shields.io/badge/Database-H2-blue?style=for-the-badge&logo=h2)
 
-Uma API RESTful robusta e escalável para gestão de bibliotecas, desenvolvida com **Java** e **Spring Boot**. O sistema permite administrar livros e autores, incluindo suporte para autenticação segura via **JWT** e validação de dados.
+API RESTful para gestão de biblioteca, desenvolvida com **Java** e **Spring Boot**. Permite gerenciar livros e usuários, com autenticação e autorização via **JWT** e controle de acesso baseado em papéis (**ADMIN** / **USER**).
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Linguagem:** Java 17+
-- **Framework Principal:** Spring Boot 3
-- **Persistência de Dados:** Spring Data JPA / Hibernate
-- **Segurança:** Spring Security & JWT (JSON Web Tokens)
+- **Linguagem:** Java 25
+- **Framework:** Spring Boot 4.1.0
+- **Build:** Gradle (Kotlin DSL)
+- **Persistência:** Spring Data JPA / Hibernate
+- **Banco de Dados:** H2 (em memória)
+- **Segurança:** Spring Security + JWT (biblioteca `jjwt`)
 - **Validação:** Jakarta Validation
-- **Gestão de Dependências:** Maven
+- **Utilitários:** Lombok
 
 ---
 
 ## 📌 Funcionalidades
 
-- 📖 **Gestão de Livros:** Criação, leitura, atualização e remoção (CRUD) de livros.
-- ✍️ **Gestão de Autores:** Associação de autores aos respetivos livros.
-- 🔒 **Autenticação & Autorização:** Controlo de acessos seguro utilizando tokens JWT.
-- 🛡️ **Validação de Dados:** Garantia de integridade nas requisições via Jakarta Validation.
+- 📖 **Gestão de Livros:** CRUD completo, atualização parcial (PATCH), busca por título e paginação.
+- 👤 **Gestão de Usuários:** CRUD completo, atualização parcial (PATCH), busca por nome e paginação.
+- 🔐 **Autenticação:** cadastro público (`/auth/signup`) e login (`/auth/login`) com emissão de token JWT.
+- 🛡️ **Autorização por papel:** rotas de `/usuarios` restritas a **ADMIN**; leitura de `/livros` liberada para **USER** e **ADMIN**, escrita restrita a **ADMIN**.
+- ✅ **Validação de dados** com mensagens de erro em português.
+- ⚠️ **Tratamento centralizado de exceções** (validação e regras de negócio) com respostas padronizadas.
+- 🔑 **Senhas criptografadas** com BCrypt.
 
 ---
 
 ## 🛠️ Como Executar o Projeto
 
 ### Pré-requisitos
-- **Java JDK 17** ou superior instalado.
-- **Maven** instalado (ou utilize o wrapper `./mvnw`).
-- Base de dados configurada (H2 / PostgreSQL / MySQL) no ficheiro `application.properties`.
+- **JDK 25** instalado (o projeto usa Gradle Toolchain, então o Gradle pode baixar o JDK correto automaticamente).
+- Não é necessário instalar o Gradle — o projeto já inclui o wrapper (`gradlew`).
 
 ### Passos para Instalação
 
-1. **Clona o repositório:**
+1. **Clone o repositório:**
    ```bash
-   git clone [https://github.com/Henrikel-1/LibraryAPI-Spring-Boot.git](https://github.com/Henrikel-1/LibraryAPI-Spring-Boot.git)
+   git clone https://github.com/Henrikel-1/LibraryAPI-Spring-Boot.git
    cd LibraryAPI-Spring-Boot
+   ```
 
-Configura as propriedades (opcional):
-Ajusta as credenciais e configurações da base de dados no ficheiro:
-src/main/resources/application.properties
+2. **Execute a aplicação:**
+   ```bash
+   ./gradlew bootRun
+   ```
+   No Windows, use `gradlew.bat bootRun`.
 
-Compila e executa a aplicação:
+3. **Acesse a API** em `http://localhost:8080`.
 
-Bash
-./mvnw spring-boot:run
+O banco de dados é um **H2 em memória**, criado automaticamente ao subir a aplicação (os dados são perdidos ao reiniciar). O console do H2 fica disponível em `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:library`, usuário `sa`, sem senha).
 
-A API estará acessível em: http://localhost:8080
-📑 Endpoints Principais (Exemplo)
-Método   Endpoint            Descrição
-POST	   /autenticacao/login	Realiza o login e retorna o token JWT
-GET	   /livros	            Lista todos os livros cadastrados
-POST	   /livros	            Cadastra um novo livro
-GET	   /livros/{id}	      Busca um livro específico pelo ID
-DELETE	/livros/{id}	      Remove um livro do sistema
+### Configuração do JWT
 
-Autor
-Desenvolvido por Keldson Henriques.
+O segredo usado para assinar os tokens pode ser definido pela variável de ambiente `JWT_SECRET`. Se não for definida, um valor padrão de desenvolvimento é usado (não recomendado para produção):
 
-GitHub: @Henrikel-1
+```bash
+export JWT_SECRET=sua-chave-secreta-aqui
+```
 
-LinkedIn: Keldson Henriques
+---
+
+## 🔑 Autenticação e Autorização
+
+Todos os usuários criados via `POST /auth/signup` recebem o papel `USER`. Para criar um usuário `ADMIN`, é necessário usar `POST /usuarios` — rota que já exige autenticação como `ADMIN`. Ou seja, **o primeiro administrador precisa ser inserido diretamente no banco** (via console H2) antes de haver um admin logado.
+
+Para acessar rotas protegidas, envie o token no cabeçalho:
+```
+Authorization: Bearer <token>
+```
+
+| Recurso | Regra de acesso |
+|---|---|
+| `POST /auth/signup`, `POST /auth/login` | Público |
+| `GET /livros/**` | `USER` ou `ADMIN` |
+| `POST` / `PUT` / `PATCH` / `DELETE /livros/**` | Somente `ADMIN` |
+| `/usuarios/**` (todas as operações) | Somente `ADMIN` |
+
+---
+
+## 📑 Endpoints
+
+### Autenticação (`/auth`)
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/auth/signup` | Cadastra um novo usuário (papel `USER`) |
+| POST | `/auth/login` | Autentica e retorna o token JWT (texto puro) |
+
+**Corpo de `/auth/signup`:**
+```json
+{
+  "nome": "Maria Silva",
+  "email": "maria@email.com",
+  "senha": "senha123"
+}
+```
+
+**Corpo de `/auth/login`:**
+```json
+{
+  "email": "maria@email.com",
+  "senha": "senha123"
+}
+```
+
+### Livros (`/livros`)
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/livros` | Lista livros paginados (padrão: 10 por página, ordenado por título) |
+| GET | `/livros/{id}` | Busca um livro pelo ID |
+| GET | `/livros/titulo?titulo=` | Busca livros por título |
+| POST | `/livros` | Cadastra um novo livro |
+| PUT | `/livros/{id}` | Atualiza um livro (todos os campos) |
+| PATCH | `/livros/{id}` | Atualiza parcialmente um livro |
+| DELETE | `/livros/{id}` | Remove um livro |
+
+**Corpo de `POST`/`PUT /livros`:**
+```json
+{
+  "titulo": "Dom Casmurro",
+  "anoPubli": 1899,
+  "editora": "Garnier",
+  "escritor": "Machado de Assis"
+}
+```
+
+> O título é único: tentar cadastrar ou renomear um livro para um título já existente retorna `409 Conflict`.
+
+### Usuários (`/usuarios`) — acesso somente ADMIN
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/usuarios` | Lista usuários paginados (padrão: 10 por página, ordenado por nome) |
+| GET | `/usuarios/{id}` | Busca um usuário pelo ID |
+| GET | `/usuarios/nome?nome=` | Busca usuários por nome |
+| POST | `/usuarios` | Cadastra um novo usuário com papel `ADMIN` |
+| PUT | `/usuarios/{id}` | Atualiza um usuário (todos os campos) |
+| PATCH | `/usuarios/{id}` | Atualiza parcialmente um usuário (nome, email, senha e/ou papel) |
+| DELETE | `/usuarios/{id}` | Remove um usuário |
+
+> O e-mail é único: tentar cadastrar ou alterar para um e-mail já existente retorna `409 Conflict`.
+
+---
+
+## ⚠️ Tratamento de Erros
+
+**Erros de validação** (`400 Bad Request`):
+```json
+{
+  "errors": {
+    "titulo": "O Titulo é obrigatório"
+  }
+}
+```
+
+**Erros de regra de negócio** (`404`, `409` ou `400`, dependendo do caso):
+```json
+{
+  "erro": "Já existe um livro cadastrado com esse título"
+}
+```
+
+---
+
+## 👤 Autor
+
+Desenvolvido por **Keldson Henriques**.
+
+- GitHub: [@Henrikel-1](https://github.com/Henrikel-1)
