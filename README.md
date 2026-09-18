@@ -44,15 +44,15 @@ API RESTful para gestão de biblioteca, desenvolvida com **Java** e **Spring Boo
 ### Passos para Instalação
 
 1. **Clone o repositório:**
-   ```bash
+```bash
    git clone https://github.com/Henrikel-1/LibraryAPI-Spring-Boot.git
    cd LibraryAPI-Spring-Boot
-   ```
+```
 
 2. **Execute a aplicação:**
-   ```bash
+```bash
    ./gradlew bootRun
-   ```
+```
    No Windows, use `gradlew.bat bootRun`.
 
 3. **Acesse a API** em `http://localhost:8080`.
@@ -71,12 +71,9 @@ export JWT_SECRET=sua-chave-secreta-aqui
 
 ## 🔑 Autenticação e Autorização
 
-Todos os usuários criados via `POST /auth/signup` recebem o papel `USER`. Para criar um usuário `ADMIN`, é necessário usar `POST /usuarios` — rota que já exige autenticação como `ADMIN`. Ou seja, **o primeiro administrador precisa ser inserido diretamente no banco** (via console H2) antes de haver um admin logado.
+Todos os usuários criados via `POST /auth/signup` recebem o papel `USER`. O primeiro `ADMIN` é criado automaticamente no startup da aplicação (variáveis `ADMIN_EMAIL` e `ADMIN_SENHA`, com valores padrão de desenvolvimento). A partir dele, `POST /usuarios` cria os demais administradores.
 
 Para acessar rotas protegidas, envie o token no cabeçalho:
-```
-Authorization: Bearer <token>
-```
 
 | Recurso | Regra de acesso |
 |---|---|
