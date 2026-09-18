@@ -67,11 +67,20 @@ O segredo usado para assinar os tokens pode ser definido pela variável de ambie
 export JWT_SECRET=sua-chave-secreta-aqui
 ```
 
+### Configuração do Admin Padrão
+
+Como não existia como criar o primeiro `ADMIN` (só era possível via `POST /usuarios`, que já exige login como `ADMIN`), a aplicação cria um admin automaticamente no startup se nenhum existir ainda. As credenciais padrão são `admin@libraryapi.com` / `admin123`, e podem ser sobrescritas pelas variáveis `ADMIN_EMAIL` e `ADMIN_SENHA`:
+
+```bash
+export ADMIN_EMAIL=seu-email@dominio.com
+export ADMIN_SENHA=sua-senha-aqui
+```
+
 ---
 
 ## 🔑 Autenticação e Autorização
 
-Todos os usuários criados via `POST /auth/signup` recebem o papel `USER`. O primeiro `ADMIN` é criado automaticamente no startup da aplicação (variáveis `ADMIN_EMAIL` e `ADMIN_SENHA`, com valores padrão de desenvolvimento). A partir dele, `POST /usuarios` cria os demais administradores.
+Todos os usuários criados via `POST /auth/signup` recebem o papel `USER`. O primeiro `ADMIN` (`admin@libraryapi.com` / `admin123` por padrão) é criado automaticamente no startup da aplicação — veja [Configuração do Admin Padrão](#configuração-do-admin-padrão). A partir dele, `POST /usuarios` cria os demais administradores.
 
 Para acessar rotas protegidas, envie o token no cabeçalho:
 
