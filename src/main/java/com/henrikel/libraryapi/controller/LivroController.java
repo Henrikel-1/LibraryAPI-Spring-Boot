@@ -56,7 +56,7 @@ public class LivroController {
         return livroService.alterarLivro(id, dto);
     }
     @PatchMapping("/{id}")
-    public LivroResponseDTO alterarAtributo(@PathVariable Long id, @RequestBody LivroPatchDTO dto){
+    public LivroResponseDTO alterarAtributo(@PathVariable Long id, @RequestBody @Valid LivroPatchDTO dto){
         return livroService.alterarAtributo(id, dto);
     }
 }

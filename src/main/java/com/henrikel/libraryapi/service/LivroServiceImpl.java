@@ -50,7 +50,7 @@ public class LivroServiceImpl implements LivroService{
     }
 
     public List<LivroResponseDTO> buscarLivroQuery(String titulo){
-        return livroRepository.findByTitulo(titulo).stream().map(livro -> new LivroResponseDTO(livro.getTitulo(), livro.getAnoPubli(), livro.getEditora(), livro.getEscritor())).toList();
+        return livroRepository.findByTituloIgnoreCase(titulo).stream().map(livro -> new LivroResponseDTO(livro.getTitulo(), livro.getAnoPubli(), livro.getEditora(), livro.getEscritor())).toList();
     }
 
     public LivroResponseDTO alterarAtributo(Long id, LivroPatchDTO dto) {

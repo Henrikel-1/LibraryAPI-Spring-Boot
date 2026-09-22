@@ -6,6 +6,7 @@ import com.henrikel.libraryapi.dto.usuarioDTOS.UsuarioRequestDTO;
 import com.henrikel.libraryapi.dto.usuarioDTOS.UsuarioResponseDTO;
 import com.henrikel.libraryapi.service.UsuarioService;
 import com.henrikel.libraryapi.service.UsuarioServiceImpl;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +28,12 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UsuarioResponseDTO> signup(@RequestBody UsuarioRequestDTO dto) {
+    public ResponseEntity<UsuarioResponseDTO> signup(@RequestBody @Valid UsuarioRequestDTO dto) {
         UsuarioResponseDTO usuario = usuarioService.salvarUsuario(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto login){
+    public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDto login){
         var authToken = new UsernamePasswordAuthenticationToken(login.email(),login.senha());
         var  authentication = authenticatorManager.authenticate(authToken);
 

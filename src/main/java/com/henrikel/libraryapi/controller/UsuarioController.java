@@ -54,7 +54,7 @@ public class UsuarioController {
     }
 
     @PatchMapping("/{id}")
-    public UsuarioResponseDTO alterarAtributo(@RequestBody UsuarioPatchDto dto, @PathVariable Long id){
+    public UsuarioResponseDTO alterarAtributo(@RequestBody @Valid UsuarioPatchDto dto, @PathVariable Long id){
         return usuarioService.alterarAtributo(id, dto);
     }
 
