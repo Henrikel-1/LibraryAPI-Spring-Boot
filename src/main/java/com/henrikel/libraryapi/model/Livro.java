@@ -17,6 +17,7 @@ import java.time.Year;
 @Setter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class Livro {
 
     @Id

@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Year;
+import java.util.Optional;
 
 import static com.henrikel.libraryapi.core.exception.TipoErro.CONFLITO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,5 +59,28 @@ public class LivroServiceTest {
         verify(livroRepository, never()).save(any(Livro.class));
         assertEquals(TipoErro.CONFLITO, exception.getTipo());
     }
-
+    @Test
+    @DisplayName("Deve retornar livro quando o id existir")
+    void deveRetornarLivroQuandoIdExistri(){
+        // Arrange:
+        Livro livro = new Livro(1L, "teste", Year.of(2005), "teste", "testador");
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        // Act:
+        LivroResponseDTO resultado = livroService.buscarLivro(1L);
+        // Assert:
+        assertEquals(livro.getTitulo(), resultado.titulo());
+        assertEquals(livro.getAnoPubli(), resultado.anoPubli());
+        assertEquals(livro.getEditora(), resultado.editora());
+        assertEquals(livro.getEscritor(), resultado.escritor());
+    }
+    @Test
+    @DisplayName("Deve lançar excecao quando o id não existir")
+    void deveLancarExcecaoQuandoIdNaoExistir(){
+        // Arrange:
+        when(livroRepository.findById(1L)).thenReturn(Optional.empty());
+        // Act + assert:
+        BusinessException exception = assertThrows(BusinessException.class, () -> livroService.buscarLivro(1L));
+        // Extra assert :
+        assertEquals(TipoErro.RECURSO_NAO_ENCONTRADO, exception.getTipo());
+    }
 }
