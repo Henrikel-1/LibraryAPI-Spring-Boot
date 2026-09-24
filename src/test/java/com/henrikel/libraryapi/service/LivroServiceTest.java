@@ -2,6 +2,7 @@ package com.henrikel.libraryapi.service;
 
 import com.henrikel.libraryapi.core.exception.BusinessException;
 import com.henrikel.libraryapi.core.exception.TipoErro;
+import com.henrikel.libraryapi.dto.livroDTOS.LivroPatchDTO;
 import com.henrikel.libraryapi.dto.livroDTOS.LivroRequestDTO;
 import com.henrikel.libraryapi.dto.livroDTOS.LivroResponseDTO;
 import com.henrikel.libraryapi.model.Livro;
@@ -16,9 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Year;
 import java.util.Optional;
 
-import static com.henrikel.libraryapi.core.exception.TipoErro.CONFLITO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -61,10 +60,10 @@ public class LivroServiceTest {
     }
     @Test
     @DisplayName("Deve retornar livro quando o id existir")
-    void deveRetornarLivroQuandoIdExistri(){
+    void deveRetornarLivroQuandoIdExistir(){
         // Arrange:
         Livro livro = new Livro(1L, "teste", Year.of(2005), "teste", "testador");
-        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        when(livroRepository.findById(livro.getId())).thenReturn(Optional.of(livro));
         // Act:
         LivroResponseDTO resultado = livroService.buscarLivro(1L);
         // Assert:
@@ -83,4 +82,132 @@ public class LivroServiceTest {
         // Extra assert :
         assertEquals(TipoErro.RECURSO_NAO_ENCONTRADO, exception.getTipo());
     }
+    @Test
+    @DisplayName("Deve deletar o livro quando o id existir")
+    void deletarLivroSeExistriId(){
+        // Arrange:
+        Livro livro = new Livro(1L, "teste", Year.of(2005), "teste", "testador");
+        when(livroRepository.findById(livro.getId())).thenReturn(Optional.of(livro));
+        // Act:
+        livroService.deletar(livro.getId());
+        // Assert:
+        verify(livroRepository).delete(livro);
+
+    }
+    @Test
+    @DisplayName("Deve lancar excecao quando nao existir o id")
+    void deveLancarExcecaoCasoIdNaoExista(){
+        // Arrange:
+        when(livroRepository.findById(1L)).thenReturn(Optional.empty());
+        // Act + Assert:
+        BusinessException exception = assertThrows(BusinessException.class, () -> livroService.deletar(1L));
+        // Extra assert:
+        assertEquals(TipoErro.RECURSO_NAO_ENCONTRADO, exception.getTipo());
+    }
+    @Test
+    @DisplayName("Deve alterar atributos do livro caso não exista outro livro com o mesmo titulo")
+    void deveAlterarAtributosCasoNaoExistaOutroLivroMesmoTitulo(){
+        // Arrange:
+        LivroRequestDTO livro = new LivroRequestDTO("Teste2", Year.of(2005), "Teste2", "Testador2");
+        Livro livro2 = new Livro(1L, "teste", Year.of(2005), "teste", "testador");
+        when(livroRepository.existsByTituloIgnoreCaseAndIdNot(livro.titulo(), 1L)).thenReturn(false);
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro2));
+        // Act:
+        livroService.alterarLivro(1L, livro);
+        // Assert:
+        assertEquals(livro.titulo(), livro2.getTitulo());
+        assertEquals(livro.anoPubli(),livro2.getAnoPubli());
+        assertEquals(livro.editora(),livro2.getEditora());
+        assertEquals(livro.escritor(),livro2.getEscritor());
+    }
+    @Test
+    @DisplayName("Deve lancar excecao caso já exista um livro com este titulo")
+    void deveLancarExcecaoCasoExistaUmLivroComEsteTitulo(){
+        // Arrange:
+        LivroRequestDTO livro = new LivroRequestDTO("Teste2", Year.of(2005), "Teste2", "Testador2");
+        when(livroRepository.existsByTituloIgnoreCaseAndIdNot(livro.titulo(), 1L)).thenReturn(true);
+        // Act + assert:
+        BusinessException exception = assertThrows(BusinessException.class, () -> livroService.alterarLivro(1L, livro));
+        // Extra asset:
+        assertEquals(TipoErro.CONFLITO, exception.getTipo());
+    }
+    @Test
+    @DisplayName("Deve lancar excecao caso o livro não seja encontrato")
+    void deveLancarExcecaoCasoLivroNaoEncontrato(){
+        // Arrange:
+        LivroRequestDTO livro = new LivroRequestDTO("Teste2", Year.of(2005), "Teste2", "Testador2");
+        when(livroRepository.findById(1L)).thenReturn(Optional.empty());
+        // Act + assert
+        BusinessException exception = assertThrows(BusinessException.class, () -> livroService.alterarLivro(1L, livro));
+        // Extra assert:
+        assertEquals(TipoErro.RECURSO_NAO_ENCONTRADO, exception.getTipo());
+    }
+    @Test
+    @DisplayName("Deve alterar todos os Atributos do livro")
+    void deveAlterarTodosAtributosDoLivro(){
+        //Arrange:
+        LivroPatchDTO livroPatchDTO = new LivroPatchDTO("Teste2", Year.of(2005), "Teste2", "Testador2");
+        Livro livro = new Livro(1L, "teste", Year.of(2005), "teste", "testador");
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        when(livroRepository.existsByTituloIgnoreCaseAndIdNot(livroPatchDTO.titulo(), 1L)).thenReturn(false);
+        //Act:
+        LivroResponseDTO resultado = livroService.alterarAtributo(1L, livroPatchDTO);
+        //Assert:
+        assertEquals(resultado.titulo(), livroPatchDTO.titulo());
+        assertEquals(resultado.anoPubli(), livroPatchDTO.anoPubli());
+        assertEquals(resultado.editora(),livroPatchDTO.editora());
+        assertEquals(resultado.escritor(), livroPatchDTO.escritor());
+    }
+    @Test
+    @DisplayName("Deve alterar parcialmente os atributos do livro")
+    void deveAlterarParcialmenteOsAtributosDoLivro(){
+        //Arrange:
+        LivroPatchDTO livroPatchDTO = new LivroPatchDTO("Teste2", null, null, null);
+        Livro livro = new Livro(1L, "teste", Year.of(2005), "teste", "testador");
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        when(livroRepository.existsByTituloIgnoreCaseAndIdNot(livroPatchDTO.titulo(), 1L)).thenReturn(false);
+        Year anoOriginal = livro.getAnoPubli();
+        String editoraOriginal = livro.getEditora();
+        String escritorOriginal = livro.getEscritor();
+        //Act:
+        LivroResponseDTO resultado = livroService.alterarAtributo(1L, livroPatchDTO);
+        //Assert:
+        assertEquals(resultado.titulo(), livroPatchDTO.titulo());
+        assertEquals(resultado.anoPubli(), anoOriginal);
+        assertEquals(resultado.editora(), editoraOriginal);
+        assertEquals(resultado.escritor(), escritorOriginal);
+    }
+    @Test
+    @DisplayName("Deve lancar excecao caso id nao encontrado")
+    void deveLancarExcecaoCasoIdNaoEncontrado(){
+        //Arrange:
+        LivroPatchDTO livroPatchDTO = new LivroPatchDTO("Teste2", null, null, null);
+        when(livroRepository.findById(1L)).thenReturn(Optional.empty());
+        //Act + assert:
+        BusinessException exception = assertThrows(BusinessException.class, () -> livroService.alterarAtributo(1L, livroPatchDTO));
+        //Extra assert:
+        assertEquals(TipoErro.RECURSO_NAO_ENCONTRADO, exception.getTipo());
+    }
+    @Test
+    @DisplayName("Deve lancar excecao caso já exista um livro com mesmo titulo")
+    void deveLancarExcecaoCasoExistaLivroComMesmoTitulo(){
+        //Arrange:
+        LivroPatchDTO livroPatchDTO = new LivroPatchDTO("Teste2", null, null, null);
+        Livro livro = new Livro(1L, "teste", Year.of(2005), "teste", "testador");
+        when(livroRepository.findById(1L)).thenReturn(Optional.of(livro));
+        when(livroRepository.existsByTituloIgnoreCaseAndIdNot(livroPatchDTO.titulo(), 1L)).thenReturn(true);
+        //Act + assert:
+        BusinessException exception = assertThrows(BusinessException.class, () -> livroService.alterarAtributo(1L, livroPatchDTO));
+        //Extra assert:
+        assertEquals(TipoErro.CONFLITO, exception.getTipo());
+    }
+
 }
+
+
+
+
+
+
+
+
