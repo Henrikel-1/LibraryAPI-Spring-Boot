@@ -36,8 +36,7 @@ public class LivroServiceImpl implements LivroService{
         livro2.setAnoPubli(livro.anoPubli());
         livro2.setEditora(livro.editora());
         livro2.setEscritor(livro.escritor());
-        livroRepository.save(livro2);
-        return toResponse(livro2);
+        return toResponse(livroRepository.save(livro2));
     }
 
     public void deletar(Long id){

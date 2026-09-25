@@ -12,6 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Usuario {
 
     public Usuario(String nome, String email, String senha, Papel papel){

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class LivroServiceTest {
+
     @Mock
     private LivroRepository livroRepository;
 
@@ -35,6 +36,7 @@ public class LivroServiceTest {
         // Arrange:
         LivroRequestDTO dto = new LivroRequestDTO("Teste", Year.of(2005), "Teste", "Testador");
         when(livroRepository.existsByTituloIgnoreCase(dto.titulo())).thenReturn(false);
+        when(livroRepository.save(any(Livro.class))).thenAnswer(invocation -> invocation.getArgument(0));
         // Act:
         LivroResponseDTO resultado = livroService.salvar(dto);
         // Assert:
@@ -42,7 +44,8 @@ public class LivroServiceTest {
         assertEquals(dto.anoPubli(), resultado.anoPubli());
         assertEquals(dto.editora(), resultado.editora());
         assertEquals(dto.escritor(), resultado.escritor());
-        verify(livroRepository).save(any(Livro.class));
+
+        verify(livroRepository, times(1)).save(any(Livro.class));
     }
     @Test
     @DisplayName("Não deve salvar quando existir um livro com o mesmo titulo!")
