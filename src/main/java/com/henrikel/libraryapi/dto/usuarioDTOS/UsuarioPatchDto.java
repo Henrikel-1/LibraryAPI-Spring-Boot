@@ -13,7 +13,6 @@ public record UsuarioPatchDto(
                               String email,
 
                               @Size(min = 1, max = 200)
-                              String senha,
-
-                              Papel papel) {
+                              String senha
+                              ) {
 }

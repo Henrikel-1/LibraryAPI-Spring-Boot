@@ -2,6 +2,7 @@ package com.henrikel.libraryapi.service;
 
 import com.henrikel.libraryapi.core.exception.BusinessException;
 import com.henrikel.libraryapi.core.exception.TipoErro;
+import com.henrikel.libraryapi.dto.usuarioDTOS.UsuarioPatchDto;
 import com.henrikel.libraryapi.dto.usuarioDTOS.UsuarioRequestDTO;
 import com.henrikel.libraryapi.dto.usuarioDTOS.UsuarioResponseDTO;
 import com.henrikel.libraryapi.model.Papel;
@@ -205,6 +206,87 @@ class UsuarioServiceTest {
         //Extra assert:
         assertEquals(TipoErro.CONFLITO, exception.getTipo());
         verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+    @Test
+    @DisplayName("alterarAtributo: Deve alterar nome e senha quando email não for informado")
+    void alterarAtributo_deveAlterarParcialmenteAtributosCasoIdExitirENaoExistirUsuarioComMesmoEmail(){
+        //Arrange:
+        UsuarioPatchDto dto = new UsuarioPatchDto("Teste", null, "teste123");
+        Usuario usuario = new Usuario(1L,"teste", "teste@gmail", "teste123", Papel.ADMIN);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.encode(dto.senha())).thenReturn("senha-criptografada-2123");
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        //Act:
+        usuarioService.alterarAtributo(1L, dto);
+        //Assert:
+        ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository).save(captor.capture());
+        Usuario usuarioSalvo = captor.getValue();
+        verify(passwordEncoder).encode(dto.senha());
+        assertEquals("teste@gmail", usuarioSalvo.getEmail());
+        assertEquals(dto.nome(), usuarioSalvo.getNome());
+        assertEquals("senha-criptografada-2123", usuarioSalvo.getSenha());
+    }
+    @Test
+    @DisplayName("alterarAtributo: deve lançar exceção quando o id não existir")
+    void alterarAtributo_deveLancarExcecaoQuandoIdNaoExistir(){
+        //Arrange:
+        UsuarioPatchDto dto = new UsuarioPatchDto("Teste", null, null);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
+        //Act + assert:
+        BusinessException exception = assertThrows(BusinessException.class, () -> usuarioService.alterarAtributo(1L, dto));
+        //Extra assert:
+        assertEquals(TipoErro.RECURSO_NAO_ENCONTRADO, exception.getTipo());
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+    @Test
+    @DisplayName("alterarAtributo: deve lançar exceção quando já existir outro usuário com mesmo email")
+    void alterarAtributo_deveLancarExcecaoQuandoEmailDuplicado(){
+        //Arrange:
+        UsuarioPatchDto dto = new UsuarioPatchDto(null, "novo@gmail.com", null);
+        Usuario usuario = new Usuario(1L,"teste", "teste@gmail", "teste123", Papel.ADMIN);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.existsByEmailIgnoreCaseAndIdNot(dto.email(), 1L)).thenReturn(true);
+        //Act + assert:
+        BusinessException exception = assertThrows(BusinessException.class, () -> usuarioService.alterarAtributo(1L, dto));
+        //Extra assert:
+        assertEquals(TipoErro.CONFLITO, exception.getTipo());
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+    @Test
+    @DisplayName("alterarAtributo: deve alterar todos os atributos informados")
+    void alterarAtributo_deveAlterarTodosOsAtributos(){
+        //Arrange:
+        UsuarioPatchDto dto = new UsuarioPatchDto("Novo Nome", "novo@gmail.com", "novaSenha123");
+        Usuario usuario = new Usuario(1L,"teste", "teste@gmail", "teste123", Papel.ADMIN);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.existsByEmailIgnoreCaseAndIdNot(dto.email(), 1L)).thenReturn(false);
+        when(passwordEncoder.encode(dto.senha())).thenReturn("senha-criptografada-2123");
+        //Act:
+        UsuarioResponseDTO resultado = usuarioService.alterarAtributo(1L, dto);
+        //Assert:
+        assertEquals(dto.nome(), resultado.nome());
+        assertEquals(dto.email(), resultado.email());
+        assertEquals(Papel.ADMIN, resultado.papel());
+        verify(usuarioRepository).save(usuario);
+    }
+    @Test
+    @DisplayName("alterarAtributo: deve alterar parcialmente preservando os campos não informados")
+    void alterarAtributo_deveAlterarParcialmente(){
+        //Arrange:
+        UsuarioPatchDto dto = new UsuarioPatchDto("Novo Nome", null, null);
+        Usuario usuario = new Usuario(1L,"teste", "teste@gmail", "teste123", Papel.ADMIN);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        String emailOriginal = usuario.getEmail();
+        String senhaOriginal = usuario.getSenha();
+        //Act:
+        UsuarioResponseDTO resultado = usuarioService.alterarAtributo(1L, dto);
+        //Assert:
+        assertEquals(dto.nome(), resultado.nome());
+        assertEquals(emailOriginal, resultado.email());
+        assertEquals(senhaOriginal, usuario.getSenha());
+        verify(passwordEncoder, never()).encode(any());
+        verify(usuarioRepository, never()).existsByEmailIgnoreCaseAndIdNot(any(), any());
     }
 
 

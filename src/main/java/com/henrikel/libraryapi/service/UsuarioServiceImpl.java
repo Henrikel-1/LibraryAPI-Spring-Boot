@@ -84,9 +84,6 @@ public class UsuarioServiceImpl implements UsuarioService{
         if (usuarioPatchDto.senha() != null){
             usuario.setSenha(passwordEncoder.encode(usuarioPatchDto.senha()));
         }
-        if (usuarioPatchDto.papel() != null){
-            usuario.setPapel(usuarioPatchDto.papel());
-        }
         usuarioRepository.save(usuario);
         return toResponse(usuario);
     }
