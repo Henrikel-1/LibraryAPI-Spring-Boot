@@ -7,7 +7,6 @@ import com.henrikel.libraryapi.dto.livroDTOS.LivroRequestDTO;
 import com.henrikel.libraryapi.dto.livroDTOS.LivroResponseDTO;
 import com.henrikel.libraryapi.model.Livro;
 import com.henrikel.libraryapi.repository.LivroRepository;
-import com.henrikel.libraryapi.repository.LivroRepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
