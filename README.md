@@ -20,6 +20,7 @@ API RESTful para gestão de biblioteca, desenvolvida com **Java** e **Spring Boo
 - **Segurança:** Spring Security + JWT (biblioteca `jjwt`)
 - **Validação:** Jakarta Validation
 - **Utilitários:** Lombok
+- **Testes:** JUnit 5, Mockito
 
 ---
 
@@ -176,6 +177,17 @@ Para acessar rotas protegidas, envie o token no cabeçalho:
 
 ---
 
+## 🧪 Testes
+
+O projeto possui testes automatizados cobrindo as camadas de serviço e persistência:
+
+- **Testes unitários** (JUnit 5 + Mockito): regras de negócio dos services (`LivroServiceImpl`, `UsuarioServiceImpl`), incluindo cenários de sucesso, conflito, recurso não encontrado e atualização parcial (PATCH).
+- **Testes de integração** (`@DataJpaTest`, H2): queries customizadas dos repositories (`LivroRepository`, `UsuarioRepository`).
+
+Para rodar a suíte completa:
+```bash
+./gradlew
+```
 ## 👤 Autor
 
 Desenvolvido por **Keldson Henriques**.
