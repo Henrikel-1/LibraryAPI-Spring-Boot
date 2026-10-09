@@ -1,38 +1,36 @@
 package com.henrikel.libraryapi.Controller;
 
 import com.henrikel.libraryapi.controller.LivroController;
-import com.henrikel.libraryapi.dto.livroDTOS.LivroRequestDTO;
-import com.henrikel.libraryapi.model.Livro;
+
 import com.henrikel.libraryapi.service.LivroService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
-import java.time.Year;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 
-@ExtendWith(MockitoExtension.class
-)
-public class LivroControllerTest {
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
-    @Mock
+
+@WebMvcTest(LivroController.class)
+class LivroControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
     private LivroService livroService;
 
-    @InjectMocks
-    private LivroController livroController;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("Deve listar todos os livros")
-    void deveListarTodosOsLivros(){
-        // Arrange:
-        LivroRequestDTO dto = new LivroRequestDTO("Teste", Year.of(2005), "Teste", "Testador");
-        livroService.salvar(dto);
-        // Act:
-        livroService.listarTodos();
-        // Assert:
+    @DisplayName("Deve listar os livros com status 200")
+    void deveListarLivros() throws Exception {
+        // Arrange: configure o mock do service pra devolver uma Page de exemplo
+
+        // Act + Assert: dispara um GET /livros e confere o status e o corpo da resposta
     }
 }
