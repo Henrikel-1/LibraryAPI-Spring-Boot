@@ -21,6 +21,7 @@ API RESTful para gestão de biblioteca, desenvolvida com **Java** e **Spring Boo
 - **Validação:** Jakarta Validation
 - **Utilitários:** Lombok
 - **Testes:** JUnit 5, Mockito
+- **Containerização:** Docker (multi-stage build)
 
 ---
 
@@ -187,6 +188,30 @@ O projeto possui testes automatizados cobrindo as camadas de serviço e persist�
 Para rodar a suíte completa:
 ```bash
 ./gradlew
+```
+
+### Executando com Docker
+
+Também é possível rodar a aplicação em um container, sem precisar instalar o JDK localmente.
+
+**1. Construa a imagem:**
+```bash
+docker build -t library-api .
+```
+
+**2. Execute o container:**
+```bash
+docker run -p 8080:8080 library-api
+```
+
+A API fica disponível em `http://localhost:8080`, assim como na execução local. As mesmas variáveis de ambiente de configuração (`JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_SENHA`) podem ser passadas com `-e`:
+
+```bash
+docker run -p 8080:8080 \
+  -e JWT_SECRET=sua-chave-secreta-aqui \
+  -e ADMIN_EMAIL=seu-email@dominio.com \
+  -e ADMIN_SENHA=sua-senha-aqui \
+  library-api
 ```
 ## 👤 Autor
 
