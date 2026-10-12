@@ -1,4 +1,10 @@
 package com.henrikel.libraryapi.repository;
 
-public class EmprestimoRepository {
+import com.henrikel.libraryapi.model.Emprestimo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface EmprestimoRepository extends JpaRepository<Emprestimo,Long> {
+    long countByUsuarioIdAndDataDevolucaoIsNull(Long id);
 }
